@@ -44,7 +44,6 @@ git clone https://github.com/yourusername/delphi-registry-editor.git
 
 2. **Modifying Values**
    - Right-click on a value to modify, rename, or delete it
-   - Double-click to edit string values directly
    - Use the binary editor for REG_BINARY values
 
 3. **Import/Export**
@@ -79,11 +78,7 @@ Key components:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Contributions are welcome! Feel free to make a pull request ect... ect...
 
 ## 📜 License
 
