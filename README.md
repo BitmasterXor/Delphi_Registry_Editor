@@ -64,7 +64,6 @@ Built using:
 - Delphi VCL Framework
 - Windows Registry API
 - Native Windows controls
-- Custom component implementations
 
 Key components:
 - TRegistry class for registry access
