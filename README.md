@@ -28,10 +28,6 @@ A powerful and user-friendly Windows Registry Editor built with Delphi, providin
 ### Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/delphi-registry-editor.git
-```
-
 2. Open the project in Delphi RAD Studio
 3. Compile and build the application
 4. Run the executable with administrative privileges
