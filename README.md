@@ -1,4 +1,4 @@
-# 🔧 Delphi Windows Registry Editor
+# 🔧 Delphi Windows Registry Editor (Work In Progress!)
 
 A powerful and user-friendly Windows Registry Editor built with Delphi, providing a graphical interface for safely viewing and modifying the Windows Registry.
 
