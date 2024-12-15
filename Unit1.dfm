@@ -209,8 +209,10 @@ object Form1: TForm1
       Height = 441
       Images = ImageList1
       Indent = 19
+      PopupMenu = PopupMenu3
       TabOrder = 0
       OnChange = TreeView1Change
+      OnContextPopup = TreeView1ContextPopup
       OnDragOver = TreeView1DragOver
       OnExpanding = TreeView1Expanding
       OnStartDrag = TreeView1StartDrag
@@ -237,6 +239,7 @@ object Form1: TForm1
       SmallImages = ImageList1
       TabOrder = 1
       ViewStyle = vsReport
+      OnContextPopup = ListView1ContextPopup
     end
   end
   object MainMenu1: TMainMenu
@@ -570,5 +573,110 @@ object Form1: TForm1
   object OpenDialog1: TOpenDialog
     Left = 41
     Top = 265
+  end
+  object PopupMenu2: TPopupMenu
+    Left = 48
+    Top = 320
+    object N2: TMenuItem
+      Caption = 'New'
+      object K1: TMenuItem
+        Caption = 'Key'
+        OnClick = K1Click
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object S1: TMenuItem
+        Caption = 'String Value'
+        OnClick = S1Click
+      end
+      object B1: TMenuItem
+        Caption = 'Binary Value'
+        OnClick = B1Click
+      end
+      object Q1: TMenuItem
+        Caption = 'DWORD (32-bit) Value'
+        OnClick = Q1Click
+      end
+      object Q2: TMenuItem
+        Caption = 'QWORD (64-bit) Value'
+        OnClick = Q2Click
+      end
+      object M3: TMenuItem
+        Caption = 'Multi-String Value'
+        OnClick = M3Click
+      end
+      object E1: TMenuItem
+        Caption = 'Expandable String Value'
+        OnClick = E1Click
+      end
+    end
+  end
+  object PopupMenu3: TPopupMenu
+    Left = 48
+    Top = 376
+    object E4: TMenuItem
+      Caption = 'Expand'
+      OnClick = E4Click
+    end
+    object N4: TMenuItem
+      Caption = 'New'
+      object K2: TMenuItem
+        Caption = 'Key'
+        OnClick = K2Click
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
+      object S2: TMenuItem
+        Caption = 'String Value'
+        OnClick = S2Click
+      end
+      object B2: TMenuItem
+        Caption = 'Binary Value'
+        OnClick = B2Click
+      end
+      object D3: TMenuItem
+        Caption = 'DWORD (32-bit) Value'
+        OnClick = D3Click
+      end
+      object Q3: TMenuItem
+        Caption = 'QWORD (64-bit) Value'
+        OnClick = Q3Click
+      end
+      object M4: TMenuItem
+        Caption = 'Multi-String Value'
+        OnClick = M4Click
+      end
+      object E6: TMenuItem
+        Caption = 'Expandable String Value'
+        OnClick = E6Click
+      end
+    end
+    object N5: TMenuItem
+      Caption = '-'
+    end
+    object D2: TMenuItem
+      Caption = 'Delete'
+      OnClick = D2Click
+    end
+    object R2: TMenuItem
+      Caption = 'Rename'
+      OnClick = R2Click
+    end
+    object N6: TMenuItem
+      Caption = '-'
+    end
+    object E5: TMenuItem
+      Caption = 'Export'
+      OnClick = E5Click
+    end
+    object N7: TMenuItem
+      Caption = '-'
+    end
+    object C1: TMenuItem
+      Caption = 'Copy Key Name'
+      OnClick = C1Click
+    end
   end
 end

@@ -22,7 +22,7 @@ uses
   Registry, System.ImageList, Math,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
   Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Menus,
-  Vcl.ImgList;
+  Vcl.ImgList,clipbrd,AclApi, AccCtrl;
 
 { ========== Type Declaration ========== }
 type
@@ -48,7 +48,35 @@ type
     SaveDialog1: TSaveDialog;
     OpenDialog1: TOpenDialog;
     TreeView1: TTreeView;
-    ListView1: TListView;     // Rename value
+    ListView1: TListView;
+    PopupMenu2: TPopupMenu;
+    N2: TMenuItem;
+    K1: TMenuItem;
+    N3: TMenuItem;
+    S1: TMenuItem;
+    B1: TMenuItem;
+    Q1: TMenuItem;
+    Q2: TMenuItem;
+    M3: TMenuItem;
+    E1: TMenuItem;
+    PopupMenu3: TPopupMenu;
+    E4: TMenuItem;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    D2: TMenuItem;
+    R2: TMenuItem;
+    N6: TMenuItem;
+    E5: TMenuItem;
+    N7: TMenuItem;
+    C1: TMenuItem;
+    K2: TMenuItem;
+    N8: TMenuItem;
+    S2: TMenuItem;
+    B2: TMenuItem;
+    D3: TMenuItem;
+    Q3: TMenuItem;
+    M4: TMenuItem;
+    E6: TMenuItem;     // Rename value
 
     { Event Handlers }
     procedure E3Click(Sender: TObject);              // Exit handler
@@ -66,7 +94,31 @@ type
     procedure TreeView1StartDrag(Sender: TObject;
       var DragObject: TDragObject);
     procedure TreeView1DragOver(Sender, Source: TObject; X, Y: Integer;
-      State: TDragState; var Accept: Boolean);             // Rename value
+      State: TDragState; var Accept: Boolean);
+    procedure ListView1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure K1Click(Sender: TObject);
+    procedure S1Click(Sender: TObject);
+    procedure B1Click(Sender: TObject);
+    procedure Q1Click(Sender: TObject);
+    procedure Q2Click(Sender: TObject);
+    procedure M3Click(Sender: TObject);
+    procedure E1Click(Sender: TObject);
+    procedure TreeView1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
+    procedure E4Click(Sender: TObject);
+    procedure K2Click(Sender: TObject);
+    procedure D2Click(Sender: TObject);
+    procedure R2Click(Sender: TObject);
+    procedure E5Click(Sender: TObject);
+    procedure P1Click(Sender: TObject);
+    procedure C1Click(Sender: TObject);
+    procedure S2Click(Sender: TObject);
+    procedure B2Click(Sender: TObject);
+    procedure D3Click(Sender: TObject);
+    procedure Q3Click(Sender: TObject);
+    procedure M4Click(Sender: TObject);
+    procedure E6Click(Sender: TObject);             // Rename value
 
   private
     Registry: TRegistry;  // Registry access object
@@ -213,6 +265,49 @@ begin
   ComputerNode.Expand(False);
 end;
 
+{ Add New Key handler }
+procedure TForm1.K1Click(Sender: TObject);
+var
+  NewName: string;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New Key', 'Enter key name:', '');
+  if NewName <> '' then
+  begin
+    Reg := TRegistry.Create(KEY_WRITE);
+    try
+      Reg.RootKey := HKEY(TreeView1.Selected.Data);
+      if Reg.OpenKey(GetNodePath(TreeView1.Selected) + '\' + NewName, True) then
+      begin
+        Reg.CloseKey;
+        LoadRegistryKeys(HKEY(TreeView1.Selected.Data), GetNodePath(TreeView1.Selected), TreeView1.Selected);
+        TreeView1.Selected.Expand(False);
+      end;
+    finally
+      Reg.Free;
+    end;
+  end;
+end;
+
+// Create new registry key
+procedure TForm1.K2Click(Sender: TObject);
+var
+  NewName: string;
+begin
+  NewName := InputBox('New Key', 'Enter key name:', '');
+  if NewName <> '' then
+  begin
+    Registry.RootKey := HKEY(TreeView1.Selected.Data);
+    if Registry.OpenKey(GetNodePath(TreeView1.Selected) + '\' + NewName, True) then
+    begin
+      Registry.CloseKey;
+      LoadRegistryKeys(HKEY(TreeView1.Selected.Data),
+        GetNodePath(TreeView1.Selected), TreeView1.Selected);
+      TreeView1.Selected.Expand(False);
+    end;
+  end;
+end;
+
 { Get the full registry path for a node }
 function TForm1.GetNodePath(Node: TTreeNode): string;
 begin
@@ -256,6 +351,21 @@ begin
 end;
 
 { Load registry subkeys for a node }
+procedure TForm1.ListView1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+  begin
+  //switching between the different possible popup menus so the user can select to modify stuff or create entirley new stuff...
+  if self.ListView1.selected = nil then
+  begin
+  self.ListView1.PopupMenu:=self.PopupMenu2;
+  end
+  else
+  begin
+  self.ListView1.PopupMenu:=self.PopupMenu1;
+  end;
+
+end;
+
 procedure TForm1.LoadRegistryKeys(const RootKey: HKEY; const Path: string; Node: TTreeNode);
 var
   Reg: TRegistry;
@@ -422,6 +532,135 @@ begin
   end;
 end;
 
+{ Add Multi-String Value handler }
+procedure TForm1.M3Click(Sender: TObject);
+var
+  NewName: string;
+  Strings: TStringList;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New Multi-String Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    Strings := TStringList.Create;
+    try
+      repeat
+        var NewString := InputBox('New Multi-String Value',
+          'Enter string value (leave empty to finish):', '');
+        if NewString = '' then
+          Break;
+        Strings.Add(NewString);
+      until False;
+
+      if Strings.Count > 0 then
+      begin
+        Reg := TRegistry.Create(KEY_WRITE);
+        try
+          Reg.RootKey := HKEY(TreeView1.Selected.Data);
+          if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+          begin
+            Reg.WriteMultiString(NewName, Strings.ToStringArray);
+            DisplayValues(GetNodePath(TreeView1.Selected));
+          end;
+        finally
+          Reg.Free;
+        end;
+      end;
+    finally
+      Strings.Free;
+    end;
+  end;
+end;
+
+// Add new multi-string value
+procedure TForm1.M4Click(Sender: TObject);
+begin
+  M3Click(Sender); // Reuse existing multi-string creation
+end;
+
+
+// Show permissions dialog
+procedure TForm1.P1Click(Sender: TObject);
+begin
+
+end;
+
+{ Add DWORD Value handler }
+procedure TForm1.Q1Click(Sender: TObject);
+var
+  NewName: string;
+  NewValue: string;
+  IntValue: Integer;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New DWORD Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    NewValue := InputBox('New DWORD Value', 'Enter value (decimal or hex with 0x prefix):', '0');
+    try
+      if Copy(NewValue, 1, 2) = '0x' then
+        IntValue := StrToInt('$' + Copy(NewValue, 3, Length(NewValue)))
+      else
+        IntValue := StrToInt(NewValue);
+
+      Reg := TRegistry.Create(KEY_WRITE);
+      try
+        Reg.RootKey := HKEY(TreeView1.Selected.Data);
+        if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+        begin
+          Reg.WriteInteger(NewName, IntValue);
+          DisplayValues(GetNodePath(TreeView1.Selected));
+        end;
+      finally
+        Reg.Free;
+      end;
+    except
+      ShowMessage('Invalid number format');
+    end;
+  end;
+end;
+
+{ Add QWORD Value handler }
+procedure TForm1.Q2Click(Sender: TObject);
+var
+  NewName: string;
+  NewValue: string;
+  IntValue: Int64;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New QWORD Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    NewValue := InputBox('New QWORD Value', 'Enter value (decimal or hex with 0x prefix):', '0');
+    try
+      if Copy(NewValue, 1, 2) = '0x' then
+        IntValue := StrToInt64('$' + Copy(NewValue, 3, Length(NewValue)))
+      else
+        IntValue := StrToInt64(NewValue);
+
+      Reg := TRegistry.Create(KEY_WRITE);
+      try
+        Reg.RootKey := HKEY(TreeView1.Selected.Data);
+        if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+        begin
+          Reg.WriteInt64(NewName, IntValue);
+          DisplayValues(GetNodePath(TreeView1.Selected));
+        end;
+      finally
+        Reg.Free;
+      end;
+    except
+      ShowMessage('Invalid number format');
+    end;
+  end;
+end;
+
+// Add new QWORD value
+procedure TForm1.Q3Click(Sender: TObject);
+begin
+  Q2Click(Sender); // Reuse existing QWORD creation
+end;
+
 { ========== Value Management ========== }
 
 { Rename value }
@@ -492,6 +731,68 @@ begin
   end;
 end;
 
+procedure TForm1.R2Click(Sender: TObject);
+var
+  OldName, NewName: string;
+  Success: Boolean;
+begin
+  if TreeView1.Selected = nil then Exit;
+
+  OldName := GetNodePath(TreeView1.Selected);
+  NewName := InputBox('Rename Key', 'Enter new name:', TreeView1.Selected.Text);
+
+  if (NewName <> '') and (NewName <> TreeView1.Selected.Text) then
+  begin
+    Success := False;
+    try
+      Registry.RootKey := HKEY(TreeView1.Selected.Data);
+      Registry.MoveKey(ExtractFilePath(OldName) + TreeView1.Selected.Text,
+                      ExtractFilePath(OldName) + NewName, True);
+      Success := True;
+    except
+      Success := False;
+    end;
+
+    if Success then
+    begin
+      TreeView1.Selected.Text := NewName;
+      DisplayValues(GetNodePath(TreeView1.Selected));
+    end
+    else
+      ShowMessage('Failed to rename registry key');
+  end;
+end;
+
+{ Add String Value handler }
+procedure TForm1.S1Click(Sender: TObject);
+var
+  NewName, NewValue: string;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New String Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    NewValue := InputBox('New String Value', 'Enter string value:', '');
+    Reg := TRegistry.Create(KEY_WRITE);
+    try
+      Reg.RootKey := HKEY(TreeView1.Selected.Data);
+      if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+      begin
+        Reg.WriteString(NewName, NewValue);
+        DisplayValues(GetNodePath(TreeView1.Selected));
+      end;
+    finally
+      Reg.Free;
+    end;
+  end;
+end;
+
+// Add new string value
+procedure TForm1.S2Click(Sender: TObject);
+begin
+  S1Click(Sender); // Reuse existing string value creation
+end;
+
 { Handle tree view selection change }
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
 begin
@@ -514,6 +815,21 @@ begin
   end;
 end;
 
+procedure TForm1.TreeView1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+  //check if the user has even selected anything at all....  If COMPUTER is selected DO NOTHING!!!!!
+  //ONLY SHOW THE MENU IF HKEY is truly selected!!!!
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Level = 0) then
+  begin
+    TreeView1.PopupMenu := nil;  // No menu if nothing selected or if Computer node
+  end
+  else
+  begin
+    TreeView1.PopupMenu := PopupMenu3;  // Show PopupMenu3 only if HKEY node is selected
+  end;
+end;
+
 procedure TForm1.TreeView1DragOver(Sender, Source: TObject; X, Y: Integer;
   State: TDragState; var Accept: Boolean);
 begin
@@ -524,6 +840,67 @@ end;
 procedure TForm1.A1Click(Sender: TObject);
 begin
 form2.showmodal;
+end;
+
+{ Add Binary Value handler }
+procedure TForm1.B1Click(Sender: TObject);
+var
+  NewName, HexString: string;
+  Reg: TRegistry;
+  ByteArray: array of Byte;
+  Str: TStringList;
+  i, Value: Integer;
+begin
+  NewName := InputBox('New Binary Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    HexString := InputBox('New Binary Value', 'Enter binary data (space-separated hex values):', '00');
+    Str := TStringList.Create;
+    try
+      Str.Delimiter := ' ';
+      Str.DelimitedText := HexString;
+      SetLength(ByteArray, Str.Count);
+
+      for i := 0 to Str.Count - 1 do
+      begin
+        try
+          Value := StrToInt('$' + Str[i]);
+          if (Value >= 0) and (Value <= 255) then
+            ByteArray[i] := Value
+          else raise Exception.Create('Invalid byte value');
+        except
+          ShowMessage('Invalid hex value: ' + Str[i]);
+          Exit;
+        end;
+      end;
+
+      Reg := TRegistry.Create(KEY_WRITE);
+      try
+        Reg.RootKey := HKEY(TreeView1.Selected.Data);
+        if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+        begin
+          Reg.WriteBinaryData(NewName, ByteArray[0], Length(ByteArray));
+          DisplayValues(GetNodePath(TreeView1.Selected));
+        end;
+      finally
+        Reg.Free;
+      end;
+    finally
+      Str.Free;
+    end;
+  end;
+end;
+
+// Add new binary value
+procedure TForm1.B2Click(Sender: TObject);
+begin
+  B1Click(Sender); // Reuse existing binary value creation
+end;
+
+// Copy key name to clipboard
+procedure TForm1.C1Click(Sender: TObject);
+begin
+  Clipboard.AsText := GetNodePath(TreeView1.Selected);
 end;
 
 procedure TForm1.D1Click(Sender: TObject);
@@ -569,6 +946,30 @@ begin
       Reg.Free;
     end;
   end;
+end;
+
+// Delete selected registry key
+procedure TForm1.D2Click(Sender: TObject);
+var
+  KeyPath: string;
+begin
+  if MessageDlg('Delete key ' + GetNodePath(TreeView1.Selected) + ' and all subkeys?',
+    mtWarning, [mbYes, mbNo], 0) = mrYes then
+  begin
+    KeyPath := GetNodePath(TreeView1.Selected);
+    Registry.RootKey := HKEY(TreeView1.Selected.Data);
+    if Registry.DeleteKey(KeyPath) then
+    begin
+      TreeView1.Selected.Delete;
+      ListView1.Items.Clear;
+    end;
+  end;
+end;
+
+// Add new DWORD value
+procedure TForm1.D3Click(Sender: TObject);
+begin
+  Q1Click(Sender); // Reuse existing DWORD creation
 end;
 
 { ========== Value Display and Formatting ========== }
@@ -696,6 +1097,31 @@ end;
 { Exit application }
 { Export registry key }
 { Export registry key }
+{ Add Expandable String Value handler }
+procedure TForm1.E1Click(Sender: TObject);
+var
+  NewName, NewValue: string;
+  Reg: TRegistry;
+begin
+  NewName := InputBox('New Expandable String Value', 'Enter value name:', '');
+  if NewName <> '' then
+  begin
+    NewValue := InputBox('New Expandable String Value',
+      'Enter string value (use %VAR% for environment variables):', '');
+    Reg := TRegistry.Create(KEY_WRITE);
+    try
+      Reg.RootKey := HKEY(TreeView1.Selected.Data);
+      if Reg.OpenKey(GetNodePath(TreeView1.Selected), False) then
+      begin
+        Reg.WriteExpandString(NewName, NewValue);
+        DisplayValues(GetNodePath(TreeView1.Selected));
+      end;
+    finally
+      Reg.Free;
+    end;
+  end;
+end;
+
 procedure TForm1.E2Click(Sender: TObject);
 var
   StartInfo: TStartupInfo;
@@ -766,6 +1192,26 @@ begin
   if Registry <> nil then
     Registry.Free;
   halt;
+end;
+
+// Expand selected node
+procedure TForm1.E4Click(Sender: TObject);
+begin
+  if TreeView1.Selected <> nil then
+    TreeView1.Selected.Expand(False);
+end;
+
+// Export selected key
+procedure TForm1.E5Click(Sender: TObject);
+begin
+  E2Click(Sender); // Reuse existing export functionality
+end;
+
+
+// Add new expandable string value
+procedure TForm1.E6Click(Sender: TObject);
+begin
+  E1Click(Sender); // Reuse existing expandable string creation
 end;
 
 end.
